@@ -18,7 +18,7 @@ class UltraSonic_Avoidance(object):
 		self.channel = channel
 		GPIO.setmode(GPIO.BCM)
 
-	def get_distance(self):
+	def get_distance(self, Ranges=500):
 		pulse_end = 0
 		pulse_start = 0
 		GPIO.setup(self.channel,GPIO.OUT)
@@ -32,15 +32,24 @@ class UltraSonic_Avoidance(object):
 			pulse_start = time.time()
 		while GPIO.input(self.channel)==1:
 			pulse_end = time.time()
-		pulse_duration = pulse_end - pulse_start
-		distance = pulse_duration * 100 * 343.0 /2
-		distance = int(distance)
-		
-		return distance
+
+		if pulse_start != 0 and pulse_end != 0:
+			pulse_duration = pulse_end - pulse_start
+			distance = pulse_duration * 100 * 343.0 /2
+			distance = int(distance)
+			
+			if distance <= Ranges:
+				#print 'start = %s'%pulse_start,
+				#print 'end = %s'%pulse_end
+
+				return distance
 
 if __name__ == '__main__':
 	UA = UltraSonic_Avoidance(17)
 	while True:
-		print 'distance', UA.get_distance()
-		#print 'distance', read_distance()
-		time.sleep(0.5)
+		distance = UA.get_distance()
+		if distance >= 0:
+			print 'distance', distance, 'cm'
+			time.sleep(0.2)
+		elif distance == None:
+			print False
