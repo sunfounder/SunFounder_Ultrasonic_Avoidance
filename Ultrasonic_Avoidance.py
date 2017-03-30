@@ -14,13 +14,13 @@ import time
 import RPi.GPIO as GPIO
 
 class Ultrasonic_Avoidance(object):
-	timeout = 0.1
+	timeout = 0.05
 
 	def __init__(self, channel):
 		self.channel = channel
 		GPIO.setmode(GPIO.BCM)
 
-	def get_distance(self):
+	def distance(self):
 		pulse_end = 0
 		pulse_start = 0
 		GPIO.setup(self.channel,GPIO.OUT)
@@ -56,6 +56,13 @@ class Ultrasonic_Avoidance(object):
 			#print 'end = %s'%pulse_end
 			return -1
 
+	def get_distance(self, mount = 5):
+		sum = 0
+		for i in range(mount):
+			a = self.distance()
+			#print '    %s' % a
+			sum += a
+		return int(sum/mount)			
 	def less_than(self, alarm_gate):
 		dis = self.get_distance()
 		status = 0
